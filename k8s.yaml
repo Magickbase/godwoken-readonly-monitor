@@ -1,0 +1,75 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: gw-readonly-monitor
+    k8s.kuboard.cn/name: gw-readonly-monitor
+  name: gw-readonly-monitor
+  namespace: testnet
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s.kuboard.cn/name: gw-readonly-monitor
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        k8s.kuboard.cn/name: gw-readonly-monitor
+    spec:
+      containers:
+        - env:
+            - name: GODWOEKN_BASEURL
+              value: # GODWOKEN NODE INTERNAL FQDN ADDRESS
+          image: IMAGE_NAME
+          imagePullPolicy: IfNotPresent
+          name: gw-readonly-monitor
+          ports:
+            - containerPort: 5000
+              name: flask
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePat2h: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+        - name: guomaoqiu-dockerhub
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: gw-readonly-monitor
+    k8s.kuboard.cn/name: gw-readonly-monitor
+  name: gw-readonly-monitor
+  namespace: testnet
+spec:
+  ports:
+    - name: cs4exz
+      nodePort: 31213
+      port: 5000
+      protocol: TCP
+      targetPort: 5000
+  selector:
+    k8s.kuboard.cn/name: gw-readonly-monitor
+  sessionAffinity: None
+  type: NodePort
+
